@@ -1,0 +1,44 @@
+services:
+  mariadb:
+    image: mariadb:11.1.2
+    restart: unless-stopped
+    volumes:
+      - ./infra/volumes/dev/database:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3307:3306"
+
+  symfony-php:
+    build:
+      context: ./infra/dev/symfony-php
+    volumes:
+      - ./infra/volumes/dev/composer:/root/.composer
+      - ./infra/dev/symfony-php/project.ini:/usr/local/etc/php/conf.d/project.ini:ro
+      - ./api:/var/www/api
+    environment:
+      APP_ENV: dev
+    depends_on:
+      - mariadb
+    tty: true
+
+  symfony-nginx:
+    image: nginx:latest
+    volumes:
+      - ./infra/volumes/dev/logs/nginx:/var/log/nginx
+      - ./infra/dev/symfony-nginx/virtualhost.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./api:/var/www/api
+    ports:
+      - "81:80"
+    depends_on:
+      - symfony-php
+    tty: true
+
+  vite:
+    build:
+      context: ./infra/dev/vite
+    ports:
+      - 5174:5173
+    command: tail -f /dev/null
+    volumes:
+      - ./app:/var/www/app

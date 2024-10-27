@@ -3,12 +3,13 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use App\Enum\OrderPlateStatus;
+use App\Enum\PlateType;
 use App\Repository\PlateRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: PlateRepository::class)]
-#[ApiResource]
 class Plate
 {
     #[ORM\Id]
@@ -21,6 +22,9 @@ class Plate
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
     private string $price;
+
+    #[ORM\Column(type: Types::INTEGER, enumType: OrderPlateStatus::class)]
+    private PlateType $plateType;
 
     public function __construct()
     {
@@ -55,4 +59,13 @@ class Plate
         return $this;
     }
 
+    public function getPlateType(): PlateType
+    {
+        return $this->plateType;
+    }
+
+    public function setPlateType(PlateType $plateType): void
+    {
+        $this->plateType = $plateType;
+    }
 }

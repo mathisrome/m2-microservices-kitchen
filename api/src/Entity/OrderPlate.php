@@ -3,12 +3,13 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use App\Enum\PlateType;
 use App\Repository\OrderPlateRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Enum\OrderPlateStatus;
 
 #[ORM\Entity(repositoryClass: OrderPlateRepository::class)]
-#[ApiResource]
 class OrderPlate
 {
     #[ORM\Id]

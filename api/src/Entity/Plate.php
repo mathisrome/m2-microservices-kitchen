@@ -7,6 +7,7 @@ use App\Enum\PlateType;
 use App\Repository\PlateRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Range;
@@ -33,8 +34,12 @@ class Plate
     #[Range(min: 1, max: 3)]
     private ?PlateType $plateType = null;
 
+    #[ORM\Column(type: 'uuid')]
+    private ?Uuid $uuid = null;
+
     public function __construct()
     {
+        $this->uuid = Uuid::v4();
     }
 
     public function getId(): int
@@ -74,5 +79,17 @@ class Plate
     public function setPlateType(?PlateType $plateType): void
     {
         $this->plateType = $plateType;
+    }
+
+    public function getUuid(): ?Uuid
+    {
+        return $this->uuid;
+    }
+
+    public function setUuid(Uuid $uuid): static
+    {
+        $this->uuid = $uuid;
+
+        return $this;
     }
 }

@@ -19,4 +19,6 @@ class PlateDto
     #[NotNull]
     #[Range(min: 1, max: 3)]
     public ?int $plateType = null;
+
+    public ?string $uuid = null;
 }

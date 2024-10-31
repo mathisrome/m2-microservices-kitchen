@@ -26,7 +26,7 @@ class Order
     /**
      * @var Collection<int, OrderPlate>
      */
-    #[ORM\OneToMany(targetEntity: OrderPlate::class, mappedBy: 'order', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: OrderPlate::class, mappedBy: 'order', cascade: ["persist"], orphanRemoval: true)]
     private Collection $orderPlates;
 
     #[ORM\ManyToOne(inversedBy: 'orders')]
@@ -70,6 +70,16 @@ class Order
     public function getOrderPlates(): Collection
     {
         return $this->orderPlates;
+    }
+
+    public function addOrderPlate(OrderPlate $orderPlate): static
+    {
+        if (!$this->orderPlates->contains($orderPlate)) {
+            $this->orderPlates->add($orderPlate);
+            $orderPlate->setOrder($this);
+        }
+
+        return $this;
     }
 
     public function getUser(): ?User

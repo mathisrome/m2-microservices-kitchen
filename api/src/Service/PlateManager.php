@@ -15,6 +15,7 @@ class PlateManager
         $dto->name = $plate->getName();
         $dto->price = $plate->getPrice();
         $dto->plateType = $plate->getPlateType()->value;
+        $dto->uuid = $plate->getUuid()->toRfc4122();
 
         return $dto;
     }

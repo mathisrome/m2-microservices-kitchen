@@ -7,12 +7,18 @@ framework:
       # https://symfony.com/doc/current/messenger.html#transport-configuration
       kitchen_users:
         dsn: '%env(MESSENGER_KITCHEN_USERS_TRANSPORT_DSN)%'
+      kitchen_orders:
+        dsn: '%env(MESSENGER_KITCHEN_ORDERS_TRANSPORT_DSN)%'
+      order_plates:
+        dsn: '%env(MESSENGER_ORDER_PLATES_TRANSPORT_DSN)%'
         # failed: 'doctrine://default?queue_name=failed'
         # sync: 'sync://'
 
     routing:
       # Route your messages to the transports
-      'App\Message\UserMessage': kitchen_users
+      App\Message\UserMessage: kitchen_users
+      App\Message\OrderMessage: kitchen_orders
+      App\Message\PlateMessage: order_plates
 
 # when@test:
 #    framework:

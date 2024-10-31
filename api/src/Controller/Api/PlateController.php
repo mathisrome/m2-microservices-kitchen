@@ -3,6 +3,7 @@
 namespace App\Controller\Api;
 
 use App\Entity\Plate;
+use App\Message\PlateMessage;
 use App\Model\PlateDto;
 use App\Service\PlateManager;
 use Doctrine\ORM\EntityManagerInterface;
@@ -10,6 +11,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -38,7 +40,8 @@ class PlateController extends AbstractController
         #[MapRequestPayload] PlateDto $plateDto,
         PlateManager $plateManager,
         ValidatorInterface $validator,
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        MessageBusInterface    $messageBus
     ): JsonResponse
     {
         $plate = $plateManager->dtoToEntity($plateDto);
@@ -52,6 +55,12 @@ class PlateController extends AbstractController
         $em->persist($plate);
         $em->flush();
 
+        $messageBus->dispatch(new PlateMessage(
+            $plate->getUuid()->toRfc4122(),
+            $plate->getName(),
+            $plate->getPrice(),
+        ));
+
         return $this->json($plateManager->entityToDto($plate));
     }
 
@@ -61,7 +70,8 @@ class PlateController extends AbstractController
         #[MapRequestPayload] PlateDto $plateDto,
         PlateManager $plateManager,
         ValidatorInterface $validator,
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        MessageBusInterface $messageBus
     ): JsonResponse
     {
         $plate = $plateManager->dtoToEntity($plateDto, $plate);
@@ -73,6 +83,12 @@ class PlateController extends AbstractController
         }
 
         $em->flush();
+
+        $messageBus->dispatch(new PlateMessage(
+            $plate->getUuid()->toRfc4122(),
+            $plate->getName(),
+            $plate->getPrice(),
+        ));
 
         return $this->json($plateManager->entityToDto($plate));
     }

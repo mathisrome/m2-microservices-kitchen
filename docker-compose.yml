@@ -8,6 +8,8 @@ services:
       MYSQL_ROOT_PASSWORD: root
     ports:
       - "3307:3306"
+    networks:
+      - nw.backend
 
   symfony-php:
     build:
@@ -21,6 +23,9 @@ services:
     depends_on:
       - mariadb
     tty: true
+    networks:
+      - nw.backend
+      - nw.microservices
 
   symfony-nginx:
     image: nginx:latest
@@ -33,12 +38,12 @@ services:
     depends_on:
       - symfony-php
     tty: true
+    networks:
+      - nw.frontend
+      - nw.backend
 
-  vite:
-    build:
-      context: ./infra/dev/vite
-    ports:
-      - 5174:5173
-    command: tail -f /dev/null
-    volumes:
-      - ./app:/var/www/app
+networks:
+  nw.microservices:
+    external: true
+  nw.frontend:
+  nw.backend:

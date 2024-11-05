@@ -2,13 +2,17 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Metadata\ApiResource;
+use App\Enum\OrderPlateStatus;
+use App\Enum\PlateType;
 use App\Repository\PlateRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Constraints\Range;
 
 #[ORM\Entity(repositoryClass: PlateRepository::class)]
-#[ApiResource]
 class Plate
 {
     #[ORM\Id]
@@ -17,13 +21,25 @@ class Plate
     private int $id;
 
     #[ORM\Column(length: 255)]
-    private string $name;
+    #[NotBlank]
+    private ?string $name = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
-    private string $price;
+    #[ORM\Column(type: Types::FLOAT)]
+    #[NotBlank]
+    #[Range(min: 1)]
+    private ?float $price = null;
+
+    #[ORM\Column(type: Types::INTEGER, enumType: PlateType::class)]
+    #[NotNull]
+    #[Range(min: 1, max: 3)]
+    private ?PlateType $plateType = null;
+
+    #[ORM\Column(type: 'uuid')]
+    private ?Uuid $uuid = null;
 
     public function __construct()
     {
+        $this->uuid = Uuid::v4();
     }
 
     public function getId(): int
@@ -43,16 +59,37 @@ class Plate
         return $this;
     }
 
-    public function getPrice(): string
+    public function getPrice(): ?float
     {
         return $this->price;
     }
 
-    public function setPrice(string $price): static
+    public function setPrice(?float $price): static
     {
         $this->price = $price;
 
         return $this;
     }
 
+    public function getPlateType(): ?PlateType
+    {
+        return $this->plateType;
+    }
+
+    public function setPlateType(?PlateType $plateType): void
+    {
+        $this->plateType = $plateType;
+    }
+
+    public function getUuid(): ?Uuid
+    {
+        return $this->uuid;
+    }
+
+    public function setUuid(Uuid $uuid): static
+    {
+        $this->uuid = $uuid;
+
+        return $this;
+    }
 }

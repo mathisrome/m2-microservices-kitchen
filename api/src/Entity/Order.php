@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Metadata\ApiResource;
 use App\Repository\OrderRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -11,16 +10,12 @@ use App\Enum\OrderPlateStatus;
 
 #[ORM\Entity(repositoryClass: OrderRepository::class)]
 #[ORM\Table(name: '`order`')]
-#[ApiResource]
 class Order
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private int $id;
-
-    #[ORM\Column(length: 255)]
-    private string $customerName;
 
     #[ORM\Column(type: 'string', enumType: OrderPlateStatus::class)]
     private OrderPlateStatus $status;
@@ -31,11 +26,12 @@ class Order
     /**
      * @var Collection<int, OrderPlate>
      */
-    #[ORM\OneToMany(targetEntity: OrderPlate::class, mappedBy: 'order', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: OrderPlate::class, mappedBy: 'order', cascade: ["persist"], orphanRemoval: true)]
     private Collection $orderPlates;
 
-    #[ORM\Column]
-    private int $clientId;
+    #[ORM\ManyToOne(inversedBy: 'orders')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $user = null;
 
     public function __construct()
     {
@@ -45,18 +41,6 @@ class Order
     public function getId(): int
     {
         return $this->id;
-    }
-
-    public function getCustomerName(): string
-    {
-        return $this->customerName;
-    }
-
-    public function setCustomerName(string $customerName): static
-    {
-        $this->customerName = $customerName;
-
-        return $this;
     }
 
     public function getStatus(): OrderPlateStatus
@@ -88,14 +72,24 @@ class Order
         return $this->orderPlates;
     }
 
-    public function getClientId(): int
+    public function addOrderPlate(OrderPlate $orderPlate): static
     {
-        return $this->clientId;
+        if (!$this->orderPlates->contains($orderPlate)) {
+            $this->orderPlates->add($orderPlate);
+            $orderPlate->setOrder($this);
+        }
+
+        return $this;
     }
 
-    public function setClientId(int $clientId): static
+    public function getUser(): ?User
     {
-        $this->clientId = $clientId;
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
 
         return $this;
     }

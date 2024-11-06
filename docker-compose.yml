@@ -1,5 +1,5 @@
 services:
-  mariadb:
+  kitchen-mariadb:
     image: mariadb:11.1.2
     restart: unless-stopped
     volumes:
@@ -11,7 +11,7 @@ services:
     networks:
       - nw.backend
 
-  symfony-php:
+  kitchen-symfony-php:
     build:
       context: ./infra/dev/symfony-php
     volumes:
@@ -21,13 +21,13 @@ services:
     environment:
       APP_ENV: dev
     depends_on:
-      - mariadb
+      - kitchen-mariadb
     tty: true
     networks:
       - nw.backend
       - nw.microservices
 
-  symfony-nginx:
+  kitchen-symfony-nginx:
     image: nginx:latest
     volumes:
       - ./infra/volumes/dev/logs/nginx:/var/log/nginx
@@ -36,7 +36,7 @@ services:
     ports:
       - "81:80"
     depends_on:
-      - symfony-php
+      - kitchen-symfony-php
     tty: true
     networks:
       - nw.frontend

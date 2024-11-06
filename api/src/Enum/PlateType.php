@@ -7,4 +7,5 @@ enum PlateType: int
     case STARTER = 1;
     case DISH = 2;
     case DESSERT = 3;
+    case DRINK = 4;
 }

@@ -40,7 +40,9 @@ services:
     tty: true
     networks:
       - nw.frontend
+      - nw.microservices
       - nw.backend
+    container_name: kitchen-symfony-nginx
 
 networks:
   nw.microservices:

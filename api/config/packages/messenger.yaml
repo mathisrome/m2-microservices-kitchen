@@ -11,6 +11,8 @@ framework:
         dsn: '%env(MESSENGER_KITCHEN_ORDERS_TRANSPORT_DSN)%'
       order_plates:
         dsn: '%env(MESSENGER_ORDER_PLATES_TRANSPORT_DSN)%'
+      delivery_receive_order_status:
+        dsn: '%env(MESSENGER_DELIVERY_RECEIVE_ORDER_STATUS_TRANSPORT_DSN)%'
         # failed: 'doctrine://default?queue_name=failed'
         # sync: 'sync://'
 
@@ -19,6 +21,7 @@ framework:
       App\Message\UserMessage: kitchen_users
       App\Message\OrderMessage: kitchen_orders
       App\Message\PlateMessage: order_plates
+      App\Message\OrderStatusMessage: delivery_receive_order_status
 
 # when@test:
 #    framework:

@@ -10,6 +10,7 @@ use App\Enum\OrderPlateStatus;
 use App\Message\OrderMessage;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
+use Symfony\Component\Uid\Uuid;
 
 #[AsMessageHandler]
 final class OrderMessageHandler
@@ -23,6 +24,7 @@ final class OrderMessageHandler
     public function __invoke(OrderMessage $message): void
     {
         $order = new Order();
+        $order->setUuid(new Uuid($message->uuid));
         $order->setUser($this->em->getRepository(User::class)->findOneByUuid($message->user));
         $order->setStatus(OrderPlateStatus::EN_ATTENTE);
         $order->setCreatedAt(new \DateTimeImmutable());

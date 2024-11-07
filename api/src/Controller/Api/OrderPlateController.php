@@ -4,24 +4,32 @@ namespace App\Controller\Api;
 
 use App\Entity\OrderPlate;
 use App\Enum\OrderPlateStatus;
+use App\Message\OrderStatusMessage;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 class OrderPlateController extends AbstractController
 {
     #[Route('/orders/{order_id}/plates/{plate_id}/', name: 'update_order_plate_status', methods: ['PATCH'])]
-    public function updateStatus(int $order_id, $plate_id, Request $request, EntityManagerInterface $entityManager): JsonResponse
-    {
+    public function updateStatus(
+        int $order_id,
+        int $plate_id,
+        Request $request,
+        EntityManagerInterface $entityManager,
+        MessageBusInterface $messageBus
+    ): JsonResponse {
         $data = json_decode($request->getContent(), true);
 
         if (!$data || !isset($data['status'])) {
             return new JsonResponse(['error' => 'Invalid JSON or missing parameters'], Response::HTTP_BAD_REQUEST);
         }
 
+        /** @var ?OrderPlate $orderPlate */
         $orderPlate = $entityManager->getRepository(OrderPlate::class)->findOneBy([
             'order' => $order_id,
             'plate' => $plate_id
@@ -61,6 +69,11 @@ class OrderPlateController extends AbstractController
         }
 
         $entityManager->flush();
+
+        $messageBus->dispatch(new OrderStatusMessage(
+            $order->getUuid()->toRfc4122(),
+            $order->getStatus()->value,
+        ));
 
         return new JsonResponse(['message' => 'Status updated successfully'], Response::HTTP_OK);
     }

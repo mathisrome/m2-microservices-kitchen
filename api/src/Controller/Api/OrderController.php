@@ -18,19 +18,28 @@ class OrderController extends AbstractController
     #[Route('/orders', name: 'get_all_orders', methods: ['GET'])]
     public function getAllOrders(EntityManagerInterface $entityManager): JsonResponse
     {
-        $orders = $entityManager->getRepository(Order::class)->findAll();
+        /** @var Order[] $orders */
+        $orders = $entityManager->getRepository(Order::class)->findBy(
+            [],
+            ['createdAt' => 'ASC']
+        );
         $data = [];
 
-        foreach ($orders as $order) {
-            $data[] = [
-                'id' => $order->getId(),
-                'uuid' => $order->getUuid()->toRfc4122(),
-                'customer_name' => $order->getCustomerName(),
-                'status' => $order->getStatus(),
-                'created_at' => $order->getCreatedAt()->format('Y-m-d H:i:s'),
-                'client_id' => $order->getClientId(),
-            ];
+        foreach ($orders as $key => $order) {
+            /** @var OrderPlate $plate */
+            foreach ($order->getOrderPlates() as $plate) {
+                if ($plate->getStatus() !== OrderPlateStatus::PRET_A_SERVIR) {
+                    $data[$key]["plates"][] = [
+                        "id" => $plate->getPlate()->getId(),
+                        "name" => $plate->getPlate()->getName(),
+                        "orderId" => $order->getId(),
+                        "status" => $plate->getStatus(),
+                    ];
+                }
+            }
         }
+
+        $data = array_values($data);
 
         return new JsonResponse($data, Response::HTTP_OK);
     }

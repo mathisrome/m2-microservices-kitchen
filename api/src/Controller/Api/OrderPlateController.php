@@ -15,7 +15,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class OrderPlateController extends AbstractController
 {
-    #[Route('/orders/{order_id}/plates/{plate_id}/', name: 'update_order_plate_status', methods: ['PATCH'])]
+    #[Route('/orders/{order_id}/plates/{plate_id}', name: 'update_order_plate_status', methods: ['PATCH'])]
     public function updateStatus(
         int $order_id,
         int $plate_id,

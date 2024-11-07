@@ -24,6 +24,7 @@ class OrderController extends AbstractController
         foreach ($orders as $order) {
             $data[] = [
                 'id' => $order->getId(),
+                'uuid' => $order->getUuid()->toRfc4122(),
                 'customer_name' => $order->getCustomerName(),
                 'status' => $order->getStatus(),
                 'created_at' => $order->getCreatedAt()->format('Y-m-d H:i:s'),
@@ -45,6 +46,7 @@ class OrderController extends AbstractController
 
         $data = [
             'id' => $order->getId(),
+            'uuid' => $order->getUuid()->toRfc4122(),
             'customer_name' => $order->getCustomerName(),
             'status' => $order->getStatus(),
             'created_at' => $order->getCreatedAt()->format('Y-m-d H:i:s'),
